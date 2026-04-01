@@ -8,7 +8,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Unzip project
         run: |
@@ -23,17 +24,12 @@ jobs:
 
       - name: Create Keystore
         run: |
-          keytool -genkey -v \
-          -keystore release.keystore \
-          -alias release \
-          -keyalg RSA \
-          -keysize 2048 \
-          -validity 10000 \
-          -storepass 123456 \
-          -keypass 123456 \
-          -dname "CN=Onur,O=Android,C=TR"
+          keytool -genkey -v -keystore release.keystore -alias release -keyalg RSA -keysize 2048 -validity 10000 -storepass 123456 -keypass 123456 -dname "CN=Onur,O=Android,C=TR"
+          mv release.keystore project/
 
-          mv release.keystore project/*/
+      - name: Show project files
+        run: |
+          find project -maxdepth 2 -type f
 
       - name: Permission
         run: |
@@ -44,6 +40,10 @@ jobs:
         run: |
           cd project/*
           ./gradlew bundleRelease
+
+      - name: Find AAB
+        run: |
+          find . -name "*.aab"
 
       - name: Upload AAB
         uses: actions/upload-artifact@v4
