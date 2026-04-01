@@ -13,7 +13,7 @@ jobs:
       - name: Unzip project
         run: |
           mkdir project
-          unzip "Android dua 90.zip" -d project
+          unzip android_dua_90.zip -d project
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -22,14 +22,17 @@ jobs:
           java-version: '17'
 
       - name: Permission
-        run: chmod +x "project/android dua/gradlew"
+        run: |
+          cd project/android_dua
+          chmod +x gradlew
 
       - name: Build Debug APK
-        working-directory: "project/android dua"
-        run: ./gradlew assembleDebug
+        run: |
+          cd project/android_dua
+          ./gradlew assembleDebug
 
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
         with:
           name: apk-build
-          path: "project/android dua/app/build/outputs/apk/normal/debug/"
+          path: project/android_dua/app/build/outputs/apk/debug/
