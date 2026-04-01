@@ -20,14 +20,14 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: '21'
 
-      - name: Create keystore
+      - name: Create release keystore
         run: |
           keytool -genkeypair -v \
             -keystore project/release.keystore \
-            -storepass 123456 \
-            -keypass 123456 \
+            -storepass password \
+            -keypass password \
             -alias release \
             -keyalg RSA \
             -keysize 2048 \
@@ -48,7 +48,7 @@ jobs:
       - name: Build release AAB
         run: |
           cd "$PROJECT_DIR"
-          ./gradlew bundleRelease
+          ./gradlew bundleNormalRelease
 
       - name: Find AAB
         run: |
@@ -58,4 +58,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: release-aab
-          path: project/**/*.aab
+          path: project/**/build/outputs/bundle/normalRelease/*.aab
