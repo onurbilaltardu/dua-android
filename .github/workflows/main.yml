@@ -21,35 +21,15 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Create release keystore
-        run: |
-          keytool -genkeypair \
-          -v \
-          -storetype PKCS12 \
-          -keystore "project/release.keystore" \
-          -alias release \
-          -storepass password \
-          -keypass password \
-          -keyalg RSA \
-          -keysize 2048 \
-          -validity 10000 \
-          -dname "CN=Onur, OU=Mobile, O=Onur, L=TR, S=TR, C=TR"
-
       - name: Permission
         run: chmod +x "project/android dua/gradlew"
 
-      - name: Build APK
+      - name: Build Debug APK
         working-directory: "project/android dua"
-        run: ./gradlew assembleRelease
+        run: ./gradlew assembleDebug
 
-      - name: Upload APK
+      - name: Upload Debug APK
         uses: actions/upload-artifact@v4
         with:
           name: apk-build
-          path: "project/android dua/app/build/outputs/apk/"
-
-      - name: Upload keystore
-        uses: actions/upload-artifact@v4
-        with:
-          name: release-keystore
-          path: "project/release.keystore"
+          path: "project/android dua/app/build/outputs/apk/debug/"
