@@ -26,19 +26,22 @@ jobs:
           distribution: temurin
           java-version: '21'
 
-      - name: Find gradle project folder
+      - name: Show files
         run: |
-          GRADLE_DIR="$(find project -name gradlew -type f | head -n 1 | xargs -I {} dirname "{}")"
-          {
-            echo 'GRADLE_DIR<<EOF'
-            echo "$GRADLE_DIR"
-            echo 'EOF'
-          } >> "$GITHUB_ENV"
-          echo "$GRADLE_DIR"
+          find project -maxdepth 3 -type f
 
       - name: Grant permission
         run: |
-          cd "$GRADLE_DIR"
+          cd "project/android dua"
           chmod +x gradlew
 
       - name: Build release AAB
+        run: |
+          cd "project/android dua"
+          ./gradlew bundleNormalRelease
+
+      - name: Upload AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-aab
+          path: project/android dua/app/build/outputs/bundle/normalRelease/*.aab
