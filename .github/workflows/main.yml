@@ -8,48 +8,48 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      - name: Unzip project
-        run: |
-          mkdir project
-          unzip "Android dua 90.zip" -d project
+    - name: Unzip project
+      run: |
+        mkdir project
+        unzip "Android dua 90.zip" -d project
 
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: '17'
 
-      - name: Create release keystore
-        run: |
-          keytool -genkeypair \
-            -v \
-            -storetype PKCS12 \
-            -keystore "project/release.keystore" \
-            -alias release \
-            -storepass password \
-            -keypass password \
-            -keyalg RSA \
-            -keysize 2048 \
-            -validity 10000 \
-            -dname "CN=Onur, OU=Mobile, O=Onur, L=TR, S=TR, C=TR"
+    - name: Create release keystore
+      run: |
+        keytool -genkeypair \
+        -v \
+        -storetype PKCS12 \
+        -keystore "project/release.keystore" \
+        -alias release \
+        -storepass password \
+        -keypass password \
+        -keyalg RSA \
+        -keysize 2048 \
+        -validity 10000 \
+        -dname "CN=Onur, OU=Mobile, O=Onur, L=TR, S=TR, C=TR"
 
-      - name: Permission
-        run: chmod +x "project/android dua/gradlew"
+    - name: Permission
+      run: chmod +x project/android dua/gradlew
 
-      - name: Build AAB
-        working-directory: "project/android dua"
-        run: ./gradlew bundleRelease
+    - name: Build APK
+      working-directory: "project/android dua"
+      run: ./gradlew assembleRelease
 
-      - name: Upload build folder
-        uses: actions/upload-artifact@v4
-        with:
-          name: android-build
-          path: "project/android dua/app/build/outputs/"
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: apk-build
+        path: "project/android dua/app/build/outputs/apk/release/"
 
-      - name: Upload keystore
-        uses: actions/upload-artifact@v4
-        with:
-          name: release-keystore
-          path: "project/release.keystore"
+    - name: Upload keystore
+      uses: actions/upload-artifact@v4
+      with:
+        name: release-keystore
+        path: "project/release.keystore"
