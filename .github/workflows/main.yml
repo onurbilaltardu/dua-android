@@ -28,8 +28,12 @@ jobs:
 
       - name: Find gradle project folder
         run: |
-          GRADLE_DIR=$(find project -name gradlew -type f | head -n 1 | xargs dirname)
-          echo "GRADLE_DIR=$GRADLE_DIR" >> $GITHUB_ENV
+          GRADLE_DIR="$(find project -name gradlew -type f | head -n 1 | xargs -I {} dirname "{}")"
+          {
+            echo 'GRADLE_DIR<<EOF'
+            echo "$GRADLE_DIR"
+            echo 'EOF'
+          } >> "$GITHUB_ENV"
           echo "$GRADLE_DIR"
 
       - name: Grant permission
@@ -38,12 +42,3 @@ jobs:
           chmod +x gradlew
 
       - name: Build release AAB
-        run: |
-          cd "$GRADLE_DIR"
-          ./gradlew bundleNormalRelease
-
-      - name: Upload AAB
-        uses: actions/upload-artifact@v4
-        with:
-          name: release-aab
-          path: project/**/build/outputs/bundle/normalRelease/*.aab
