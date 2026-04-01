@@ -8,12 +8,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Unzip project
         run: |
           mkdir project
-          unzip "Android dua 90.zip" -d project
+          unzip proje.zip -d project
 
       - name: Setup Java
         uses: actions/setup-java@v4
