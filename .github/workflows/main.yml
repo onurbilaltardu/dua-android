@@ -42,11 +42,11 @@ jobs:
         working-directory: "project/android dua"
         run: ./gradlew bundleRelease
 
-      - name: Upload AAB
+      - name: Upload build folder
         uses: actions/upload-artifact@v4
         with:
-          name: app-release
-          path: "project/android dua/app/build/outputs/bundle/release/*.aab"
+          name: android-build
+          path: "project/android dua/app/build/outputs/"
 
       - name: Upload keystore
         uses: actions/upload-artifact@v4
