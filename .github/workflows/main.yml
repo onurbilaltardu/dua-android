@@ -1,4 +1,4 @@
-name: Android Build
+name: Android Release Build
 
 on:
   workflow_dispatch:
@@ -22,28 +22,23 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Find project folder
-        run: |
-          cd project
-          ls
-
       - name: Permission
         run: |
           cd project/*
           chmod +x gradlew
 
-      - name: Build APK
+      - name: Build Release AAB
         run: |
           cd project/*
-          ./gradlew assembleDebug
+          ./gradlew bundleRelease
 
-      - name: Find APK
+      - name: Find AAB
         run: |
-          find . -name "*.apk"
+          find . -name "*.aab"
 
-      - name: Upload APK
+      - name: Upload AAB
         uses: actions/upload-artifact@v4
         with:
-          name: android-apk
+          name: android-release-aab
           path: |
-            project/**/*.apk
+            project/**/*.aab
