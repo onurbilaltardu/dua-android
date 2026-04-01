@@ -8,29 +8,48 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Unzip project
-      run: |
-        mkdir project
-        unzip "Android dua 90.zip" -d project
+      - name: Unzip project
+        run: |
+          mkdir project
+          unzip "Android dua 90.zip" -d project
 
-    - name: Setup Java
-      uses: actions/setup-java@v4
-      with:
-        distribution: temurin
-        java-version: 17
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
 
-    - name: Permission
-      run: chmod +x "project/android dua/gradlew"
+      - name: Create release keystore
+        run: |
+          keytool -genkeypair \
+            -v \
+            -storetype PKCS12 \
+            -keystore "project/release.keystore" \
+            -alias release \
+            -storepass password \
+            -keypass password \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -dname "CN=Onur, OU=Mobile, O=Onur, L=TR, S=TR, C=TR"
 
-    - name: Build AAB
-      working-directory: "project/android dua"
-      run: ./gradlew bundleRelease
+      - name: Permission
+        run: chmod +x "project/android dua/gradlew"
 
-    - name: Upload AAB
-      uses: actions/upload-artifact@v4
-      with:
-        name: app-release
-        path: "project/android dua/app/build/outputs/bundle/release/*.aab"
+      - name: Build AAB
+        working-directory: "project/android dua"
+        run: ./gradlew bundleRelease
+
+      - name: Upload AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release
+          path: "project/android dua/app/build/outputs/bundle/release/*.aab"
+
+      - name: Upload keystore
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-keystore
+          path: "project/release.keystore"
