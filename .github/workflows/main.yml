@@ -1,4 +1,4 @@
-Name: Android Release Build
+name: Android Release Build
 
 on:
   workflow_dispatch:
@@ -12,7 +12,7 @@ jobs:
 
       - name: Unzip project
         run: |
-          mkdir -p project
+          mkdir project
           unzip proje.zip -d project
 
       - name: Setup Java
@@ -23,7 +23,6 @@ jobs:
 
       - name: Create Keystore
         run: |
-          # Anahtarı en üst dizinde oluşturuyoruz
           keytool -genkey -v \
           -keystore release.keystore \
           -alias release \
@@ -34,17 +33,17 @@ jobs:
           -keypass 123456 \
           -dname "CN=Onur,O=Android,C=TR"
 
+          mv release.keystore project/*/
+
+      - name: Permission
+        run: |
+          cd project/*
+          chmod +x gradlew
+
       - name: Build Release AAB
         run: |
-          # Proje klasörüne gir ve gradlew'i bul
-          cd project && find . -name "gradlew" -exec chmod +x {} +
-          
-          # Gradle'a şifreleri komutla veriyoruz (En kritik yer burası)
-          cd project && ./gradlew bundleRelease \
-            -Pandroid.injected.signing.store.file=$(pwd)/../release.keystore \
-            -Pandroid.injected.signing.store.password=123456 \
-            -Pandroid.injected.signing.key.alias=release \
-            -Pandroid.injected.signing.key.password=123456
+          cd project/*
+          ./gradlew bundleRelease
 
       - name: Upload AAB
         uses: actions/upload-artifact@v4
