@@ -1,4 +1,4 @@
-name: Build AAB
+name: Android Build
 
 on:
   workflow_dispatch:
@@ -8,50 +8,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    - name: Repo indir
+      uses: actions/checkout@v4
 
-      - name: Unzip project
-        run: unzip -o proje.zip -d project
+    - name: Java kur
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: 21
 
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '21'
+    - name: Gradle izin ver
+      run: chmod +x "./Android_dua_90_admob_integrated-2/android dua/gradlew"
 
-      - name: Patch signing config
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          p = Path("project/Android_dua_90_admob_integrated-2/android dua/app/build.gradle")
-          text = p.read_text(encoding="utf-8")
-          old = """release {
-            storeFile file(\"../../release.keystore\")
-            storePassword \"password\"
-            keyAlias \"release\"
-            keyPassword \"password\"
-        }"""
-          new = """release {
-            storeFile file(\"../../upload.keystore\")
-            storePassword \"password\"
-            keyAlias \"upload\"
-            keyPassword \"password\"
-        }"""
-          if old in text:
-              text = text.replace(old, new, 1)
-          p.write_text(text, encoding="utf-8")
-          print("build.gradle patched")
-          PY
+    - name: AAB build al
+      run: |
+        cd "Android_dua_90_admob_integrated-2/android dua"
+        ./gradlew bundleNormalRelease
 
-      - name: Build AAB
-        run: |
-          cd "project/Android_dua_90_admob_integrated-2/android dua"
-          chmod +x gradlew
-          ./gradlew bundleNormalRelease
-
-      - name: Upload AAB
-        uses: actions/upload-artifact@v4
-        with:
-          name: app
-          path: project/Android_dua_90_admob_integrated-2/android dua/app/build/outputs/bundle/normalRelease/*.aab
+    - name: AAB yükle
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-release
+        path: Android_dua_90_admob_integrated-2/android dua/app/build/outputs/bundle/normalRelease/*.aab
