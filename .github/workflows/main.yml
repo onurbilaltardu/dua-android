@@ -8,25 +8,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Repo indir
-      uses: actions/checkout@v4
+      - name: Repo indir
+        uses: actions/checkout@v4
 
-    - name: Java kur
-      uses: actions/setup-java@v4
-      with:
-        distribution: temurin
-        java-version: 21
+      - name: Projeyi aç
+        run: unzip -o proje.zip -d project
 
-    - name: Gradle izin ver
-      run: chmod +x "./Android_dua_90_admob_integrated-2/android dua/gradlew"
+      - name: Java kur
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
 
-    - name: AAB build al
-      run: |
-        cd "Android_dua_90_admob_integrated-2/android dua"
-        ./gradlew bundleNormalRelease
+      - name: Gradle izin ver
+        run: chmod +x "project/Android_dua_90_admob_integrated-2/android dua/gradlew"
 
-    - name: AAB yükle
-      uses: actions/upload-artifact@v4
-      with:
-        name: app-release
-        path: Android_dua_90_admob_integrated-2/android dua/app/build/outputs/bundle/normalRelease/*.aab
+      - name: AAB build al
+        run: |
+          cd "project/Android_dua_90_admob_integrated-2/android dua"
+          ./gradlew bundleNormalRelease
+
+      - name: AAB yükle
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release
+          path: project/Android_dua_90_admob_integrated-2/android dua/app/build/outputs/bundle/normalRelease/*.aab
