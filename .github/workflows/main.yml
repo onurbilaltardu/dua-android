@@ -16,36 +16,30 @@ jobs:
           mkdir project
           unzip proje.zip -d project
 
-      - name: Copy signing keystore
-        run: |
-          cp signing.keystore project/signing.keystore
-
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '21'
 
-      - name: Show files
+      - name: Find project folder
         run: |
-          find project -maxdepth 4 -type f
+          PROJECT_DIR=$(find project -name gradlew -type f | head -n 1 | xargs dirname)
+          echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
+          echo $PROJECT_DIR
+
+      - name: Copy keystore
+        run: |
+          cp signing.keystore "$PROJECT_DIR/../signing.keystore"
 
       - name: Grant permission
         run: |
-          GRADLEW_PATH="$(find project -type f -name gradlew | head -n 1)"
-          GRADLE_DIR="$(dirname "$GRADLEW_PATH")"
-          echo "$GRADLEW_PATH"
-          echo "$GRADLE_DIR"
-          cd "$GRADLE_DIR"
+          cd "$PROJECT_DIR"
           chmod +x gradlew
 
-      - name: Build release AAB
+      - name: Build AAB
         run: |
-          GRADLEW_PATH="$(find project -type f -name gradlew | head -n 1)"
-          GRADLE_DIR="$(dirname "$GRADLEW_PATH")"
-          echo "$GRADLEW_PATH"
-          echo "$GRADLE_DIR"
-          cd "$GRADLE_DIR"
+          cd "$PROJECT_DIR"
           ./gradlew bundleNormalRelease
 
       - name: Upload AAB
