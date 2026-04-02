@@ -15,15 +15,19 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Grant permission
-        run: chmod +x android/gradlew
+      - name: Listele
+        run: |
+          pwd
+          ls -la
+          find . -maxdepth 3 -type f | sed -n '1,200p'
 
       - name: Build AAB
         run: |
-          cd android
+          cd "dua_ads_hardened_checked_v2/android dua"
+          chmod +x gradlew
           ./gradlew bundleRelease
 
       - uses: actions/upload-artifact@v4
         with:
           name: app
-          path: android/app/build/outputs/bundle/release/*.aab
+          path: dua_ads_hardened_checked_v2/android dua/app/build/outputs/bundle/release/*.aab
