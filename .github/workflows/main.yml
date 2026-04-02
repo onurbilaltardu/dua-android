@@ -8,24 +8,32 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-java@v4
+      - name: Setup Java
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
-      - name: Unzip
+      - name: Check zip
+        run: unzip -t proje.zip
+
+      - name: Unzip project
         run: unzip -o proje.zip -d project
 
       - name: Build
+        shell: bash
         run: |
-          DIR=$(find project -name gradlew | head -n 1 | xargs dirname)
+          DIR="$(dirname "$(find project -type f -name gradlew | head -n 1)")"
           chmod +x "$DIR/gradlew"
           cd "$DIR"
-          ./gradlew bundleRelease
+          ./gradlew clean bundleNormalRelease --stacktrace
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload AAB
+        uses: actions/upload-artifact@v4
         with:
-          name: aab
-          path: project/**/app/build/outputs/bundle/release/*.aab
+          name: app-normal-release
+          path: project/**/app/build/outputs/bundle/normalRelease/*.aab
+          if-no-files-found: error
