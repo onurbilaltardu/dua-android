@@ -13,8 +13,8 @@ jobs:
 
       - name: Unzip project
         run: |
-          mkdir project
-          unzip proje.zip -d project
+          mkdir -p project
+          unzip -o proje.zip -d project
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -24,13 +24,17 @@ jobs:
 
       - name: Find project folder
         run: |
-          PROJECT_DIR=$(find project -name gradlew -type f | head -n 1 | xargs dirname)
-          echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
-          echo $PROJECT_DIR
+          PROJECT_DIR="$(find project -type f -name gradlew | head -n 1 | xargs -I {} dirname "{}")"
+          {
+            echo 'PROJECT_DIR<<EOF'
+            echo "$PROJECT_DIR"
+            echo 'EOF'
+          } >> "$GITHUB_ENV"
+          echo "$PROJECT_DIR"
 
       - name: Copy keystore
         run: |
-          cp signing.keystore "$PROJECT_DIR/../signing.keystore"
+          cp signing.keystore "$(dirname "$PROJECT_DIR")/signing.keystore"
 
       - name: Grant permission
         run: |
