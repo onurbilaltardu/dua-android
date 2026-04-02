@@ -15,18 +15,14 @@ jobs:
           distribution: temurin
           java-version: '21'
 
-      - name: Unzip
-        run: unzip -o proje.zip -d project
-
-      - name: Grant permission
-        run: chmod +x "project/Android_dua_90_admob_integrated-2/android dua/gradlew"
-
       - name: Build
         run: |
-          cd "project/Android_dua_90_admob_integrated-2/android dua"
+          APP_DIR="$(find . -type f -name gradlew | head -n 1 | xargs dirname)"
+          chmod +x "$APP_DIR/gradlew"
+          cd "$APP_DIR"
           ./gradlew clean bundleNormalRelease --stacktrace
 
       - uses: actions/upload-artifact@v4
         with:
           name: app-normal-release
-          path: project/Android_dua_90_admob_integrated-2/android dua/app/build/outputs/bundle/normalRelease/*.aab
+          path: "**/app/build/outputs/bundle/normalRelease/*.aab"
