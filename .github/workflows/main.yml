@@ -1,4 +1,4 @@
-name: Android Build
+name: Build AAB
 
 on:
   workflow_dispatch:
@@ -8,28 +8,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Repo indir
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Projeyi ac
-        run: unzip -o proje.zip -d project
-
-      - name: Java kur
-        uses: actions/setup-java@v4
+      - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 21
+          java-version: '21'
 
-      - name: Gradle izin ver
+      - name: Unzip
+        run: unzip -o proje.zip -d project
+
+      - name: Grant permission
         run: chmod +x "project/Android_dua_90_admob_integrated-2/android dua/gradlew"
 
-      - name: AAB build al
+      - name: Build
         run: |
           cd "project/Android_dua_90_admob_integrated-2/android dua"
-          ./gradlew bundleNormalRelease
+          ./gradlew clean bundleNormalRelease --stacktrace
 
-      - name: AAB yukle
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
-          name: app-release
+          name: app-normal-release
           path: project/Android_dua_90_admob_integrated-2/android dua/app/build/outputs/bundle/normalRelease/*.aab
