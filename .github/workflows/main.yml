@@ -13,24 +13,19 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: '17'
 
-      - name: Check zip
-        run: unzip -t proje.zip
-
-      - name: Unzip project
+      - name: Unzip
         run: unzip -o proje.zip -d project
 
-      - name: Find project and build
-        shell: bash
+      - name: Build
         run: |
-          PROJECT="$(dirname "$(find project -type f -name gradlew | head -n 1)")"
-          echo "$PROJECT"
-          chmod +x "$PROJECT/gradlew"
-          cd "$PROJECT"
-          ./gradlew clean bundleNormalRelease --stacktrace
+          DIR=$(find project -name gradlew | head -n 1 | xargs dirname)
+          chmod +x "$DIR/gradlew"
+          cd "$DIR"
+          ./gradlew bundleRelease
 
       - uses: actions/upload-artifact@v4
         with:
-          name: app-normal-release
-          path: project/**/app/build/outputs/bundle/normalRelease/*.aab
+          name: aab
+          path: project/**/app/build/outputs/bundle/release/*.aab
