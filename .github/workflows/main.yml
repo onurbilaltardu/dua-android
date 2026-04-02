@@ -18,13 +18,31 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 21
+          java-version: '21'
 
-      - name: Create keystore
+      - name: Patch signing config
         run: |
-          mkdir -p project/Android_dua_90_admob_integrated-2
-          touch project/Android_dua_90_admob_integrated-2/release.keystore
-          touch project/Android_dua_90_admob_integrated-2/upload.keystore
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path("project/Android_dua_90_admob_integrated-2/android dua/app/build.gradle")
+          text = p.read_text(encoding="utf-8")
+          old = """release {
+            storeFile file(\"../../release.keystore\")
+            storePassword \"password\"
+            keyAlias \"release\"
+            keyPassword \"password\"
+        }"""
+          new = """release {
+            storeFile file(\"../../upload.keystore\")
+            storePassword \"password\"
+            keyAlias \"upload\"
+            keyPassword \"password\"
+        }"""
+          if old in text:
+              text = text.replace(old, new, 1)
+          p.write_text(text, encoding="utf-8")
+          print("build.gradle patched")
+          PY
 
       - name: Build AAB
         run: |
