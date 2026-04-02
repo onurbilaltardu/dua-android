@@ -1,16 +1,36 @@
-name: Check Files
+name: Build AAB
 
 on:
   workflow_dispatch:
 
 jobs:
-  check:
+  build:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Show files
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Check zip
+        run: unzip -t proje.zip
+
+      - name: Unzip project
+        run: unzip -o proje.zip -d project
+
+      - name: Find project and build
+        shell: bash
         run: |
-          pwd
-          ls -la
-          find . -maxdepth 4 | sort
+          PROJECT="$(dirname "$(find project -type f -name gradlew | head -n 1)")"
+          echo "$PROJECT"
+          chmod +x "$PROJECT/gradlew"
+          cd "$PROJECT"
+          ./gradlew clean bundleNormalRelease --stacktrace
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: app-normal-release
+          path: project/**/app/build/outputs/bundle/normalRelease/*.aab
