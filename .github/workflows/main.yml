@@ -24,4 +24,32 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '21
+          java-version: '21'
+
+      - name: Show files
+        run: |
+          find project -maxdepth 4 -type f
+
+      - name: Grant permission
+        run: |
+          GRADLEW_PATH="$(find project -type f -name gradlew | head -n 1)"
+          GRADLE_DIR="$(dirname "$GRADLEW_PATH")"
+          echo "$GRADLEW_PATH"
+          echo "$GRADLE_DIR"
+          cd "$GRADLE_DIR"
+          chmod +x gradlew
+
+      - name: Build release AAB
+        run: |
+          GRADLEW_PATH="$(find project -type f -name gradlew | head -n 1)"
+          GRADLE_DIR="$(dirname "$GRADLEW_PATH")"
+          echo "$GRADLEW_PATH"
+          echo "$GRADLE_DIR"
+          cd "$GRADLE_DIR"
+          ./gradlew bundleNormalRelease
+
+      - name: Upload AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-aab
+          path: project/**/*.aab
