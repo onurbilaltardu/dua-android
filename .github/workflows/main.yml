@@ -1,4 +1,4 @@
-name: Android Release Build
+name: Build Android AAB
 
 on:
   workflow_dispatch:
@@ -8,46 +8,35 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout repo
         uses: actions/checkout@v4
 
       - name: Unzip project
-        run: |
-          mkdir -p project
-          unzip -o proje.zip -d project
+        run: unzip -o proje.zip -d project
 
-      - name: Setup Java
+      - name: Setup Java 21
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '21'
 
-      - name: Find project folder
+      - name: Move to project folder
         run: |
-          PROJECT_DIR="$(find project -type f -name gradlew | head -n 1 | xargs -I {} dirname "{}")"
-          {
-            echo 'PROJECT_DIR<<EOF'
-            echo "$PROJECT_DIR"
-            echo 'EOF'
-          } >> "$GITHUB_ENV"
-          echo "$PROJECT_DIR"
+          cd "project/Android_dua_90_admob_integrated-2/android dua"
+          ls
 
-      - name: Copy keystore
+      - name: Give gradlew permission
         run: |
-          cp signing.keystore "$(dirname "$PROJECT_DIR")/signing.keystore"
-
-      - name: Grant permission
-        run: |
-          cd "$PROJECT_DIR"
+          cd "project/Android_dua_90_admob_integrated-2/android dua"
           chmod +x gradlew
 
       - name: Build AAB
         run: |
-          cd "$PROJECT_DIR"
+          cd "project/Android_dua_90_admob_integrated-2/android dua"
           ./gradlew bundleNormalRelease
 
       - name: Upload AAB
         uses: actions/upload-artifact@v4
         with:
-          name: release-aab
-          path: project/**/*.aab
+          name: AAB
+          path: project/Android_dua_90_admob_integrated-2/android dua/app/build/outputs/bundle/normalRelease/*.aab
