@@ -24,24 +24,4 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '21'
-
-      - name: Show files
-        run: |
-          find project -maxdepth 3 -type f
-
-      - name: Grant permission
-        run: |
-          cd "project/android dua"
-          chmod +x gradlew
-
-      - name: Build release AAB
-        run: |
-          cd "project/android dua"
-          ./gradlew bundleNormalRelease
-
-      - name: Upload AAB
-        uses: actions/upload-artifact@v4
-        with:
-          name: release-aab
-          path: project/android dua/app/build/outputs/bundle/normalRelease/*.aab
+          java-version: '21
