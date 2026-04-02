@@ -1,33 +1,16 @@
-name: Build AAB
+name: Check Files
 
 on:
   workflow_dispatch:
 
 jobs:
-  build:
+  check:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-
-      - name: Listele
+      - name: Show files
         run: |
           pwd
           ls -la
-          find . -maxdepth 3 -type f | sed -n '1,200p'
-
-      - name: Build AAB
-        run: |
-          cd "dua_ads_hardened_checked_v2/android dua"
-          chmod +x gradlew
-          ./gradlew bundleRelease
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: app
-          path: dua_ads_hardened_checked_v2/android dua/app/build/outputs/bundle/release/*.aab
+          find . -maxdepth 4 | sort
