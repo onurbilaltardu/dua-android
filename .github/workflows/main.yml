@@ -11,7 +11,7 @@ jobs:
       - name: Repo indir
         uses: actions/checkout@v4
 
-      - name: Projeyi aç
+      - name: Projeyi ac
         run: unzip -o proje.zip -d project
 
       - name: Java kur
@@ -19,23 +19,6 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-
-      - name: Signing ayarini duzelt
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          p = Path("project/Android_dua_90_admob_integrated-2/android dua/app/build.gradle")
-          text = p.read_text(encoding="utf-8")
-
-          text = text.replace('storeFile file("../../release.keystore")', 'storeFile file("../../upload.keystore")')
-          text = text.replace('storePassword "password"', 'storePassword "mTSlqs4P4TEE"')
-          text = text.replace('keyAlias "release"', 'keyAlias "my-key-alias"')
-          text = text.replace('keyAlias "upload"', 'keyAlias "my-key-alias"')
-          text = text.replace('keyPassword "password"', 'keyPassword "mTSlqs4P4TEE"')
-
-          p.write_text(text, encoding="utf-8")
-          print("build.gradle duzeltildi")
-          PY
 
       - name: Gradle izin ver
         run: chmod +x "project/Android_dua_90_admob_integrated-2/android dua/gradlew"
