@@ -1,4 +1,4 @@
-name: Build AAB
+name: Build AAB and APK
 
 on:
   workflow_dispatch:
@@ -23,17 +23,24 @@ jobs:
       - name: Unzip project
         run: unzip -o proje.zip -d project
 
-      - name: Build
+      - name: Build AAB and APK
         shell: bash
         run: |
           DIR="$(dirname "$(find project -type f -name gradlew | head -n 1)")"
           chmod +x "$DIR/gradlew"
           cd "$DIR"
-          ./gradlew clean bundleNormalRelease --stacktrace
+          ./gradlew clean bundleNormalRelease assembleDebug --stacktrace
 
       - name: Upload AAB
         uses: actions/upload-artifact@v4
         with:
           name: app-normal-release
           path: project/**/app/build/outputs/bundle/normalRelease/*.aab
+          if-no-files-found: error
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug-apk
+          path: project/**/app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
