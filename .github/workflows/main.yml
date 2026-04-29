@@ -11,32 +11,34 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up JDK
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
+      # 🔧 Splash hatasını otomatik fix
       - name: Fix splash crash
         run: |
           sed -i 's/@drawable\/splash/@android:color\/white/g' android/app/src/main/res/values/*.xml || true
           sed -i 's/@drawable\/splash/@android:color\/white/g' android/app/src/main/res/values-night/*.xml || true
 
-      - name: Grant permission
-        run: chmod +x gradlew
+      # 🔥 BUILD BURASI
+      - name: Build APK & AAB
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleRelease
+          ./gradlew bundleRelease
 
-      - name: Build APK
-        run: ./gradlew assembleRelease
-
-      - name: Build AAB
-        run: ./gradlew bundleRelease
-
+      # 📦 APK indir
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: app-release-apk
           path: android/app/build/outputs/apk/release/app-release.apk
 
+      # 📦 AAB indir
       - name: Upload AAB
         uses: actions/upload-artifact@v4
         with:
