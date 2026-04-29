@@ -16,32 +16,26 @@ jobs:
           java-version: '17'
 
       - name: Unzip
-        run: unzip -o proje.zip -d extracted
-
-      - name: Fix folder names
         run: |
-          cd extracted
-          find . -depth -name "* *" -exec bash -c 'mv "$0" "${0// /_}"' {} \;
-          find . -depth -name "*(*" -exec bash -c 'mv "$0" "${0//(/_}"' {} \;
-          find . -depth -name "*)" -exec bash -c 'mv "$0" "${0//)/_}"' {} \;
+          unzip -o proje.zip -d extracted
+          ls -R extracted
 
-      - name: Fix splash crash
+      - name: Find gradlew safely
         run: |
-          find extracted -type f -name "*.xml" -exec sed -i 's/@drawable\/splash/@android:color\/white/g' {} +
+          FILE=$(find extracted -type f -name gradlew | head -n 1)
+          echo "FOUND FILE: $FILE"
 
-      - name: Find and Build
-        run: |
-          FILE=$(find extracted -type f -name "gradlew" | head -n 1)
           DIR=$(dirname "$FILE")
-
           echo "DIR: $DIR"
 
+          echo "DIR=$DIR" >> $GITHUB_ENV
+
+      - name: Build
+        run: |
           cd "$DIR"
           chmod +x gradlew
-
-          ./gradlew clean
-          ./gradlew assembleRelease
-          ./gradlew bundleRelease
+          ./gradlew assembleRelease --no-daemon
+          ./gradlew bundleRelease --no-daemon
 
       - uses: actions/upload-artifact@v4
         with:
