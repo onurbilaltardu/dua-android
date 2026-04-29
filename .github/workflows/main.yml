@@ -8,57 +8,33 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
+      - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      # ZIP'i aç
-      - name: Unzip project
-        run: |
-          unzip -o proje.zip -d extracted
+      - name: Unzip
+        run: unzip -o proje.zip -d extracted
 
-      # İçinde gradlew olan klasörü bul
-      - name: Find gradlew folder
-        id: find
+      - name: Build APK & AAB
         run: |
           DIR=$(find extracted -type f -name "gradlew" | head -n 1 | xargs dirname)
-          echo "DIR=$DIR" >> $GITHUB_OUTPUT
-          echo "Found gradlew in: $DIR"
+          echo "Gradle path: $DIR"
 
-      # Bulamazsa patlat (net görelim)
-      - name: Stop if not found
-        run: |
-          if [ -z "${{ steps.find.outputs.DIR }}" ]; then
-            echo "GRADLEW NOT FOUND"
-            exit 1
-          fi
-
-      # Splash fix (varsa)
-      - name: Fix splash
-        run: |
-          sed -i 's/@drawable\/splash/@android:color\/white/g' ${{ steps.find.outputs.DIR }}/app/src/main/res/values/*.xml || true
-
-      # BUILD
-      - name: Build
-        run: |
-          cd ${{ steps.find.outputs.DIR }}
+          cd "$DIR"
           chmod +x gradlew
+
           ./gradlew assembleRelease
           ./gradlew bundleRelease
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: apk
-          path: '**/app-release.apk'
+          path: '**/*.apk'
 
-      - name: Upload AAB
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: aab
           path: '**/*.aab'
