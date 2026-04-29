@@ -30,6 +30,17 @@ jobs:
 
           echo "DIR=$DIR" >> $GITHUB_ENV
 
+      - name: Fix missing splash drawable
+        run: |
+          mkdir -p "$DIR/app/src/main/res/drawable"
+          rm -rf "$DIR/app/src/main/res/drawable/splash.xml"
+          cat > "$DIR/app/src/main/res/drawable/splash.xml" <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <shape xmlns:android="http://schemas.android.com/apk/res/android">
+              <solid android:color="#FFFFFF"/>
+          </shape>
+          EOF
+
       - name: Build
         run: |
           cd "$DIR"
