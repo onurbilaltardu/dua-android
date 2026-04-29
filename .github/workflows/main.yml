@@ -18,10 +18,13 @@ jobs:
       - name: Unzip
         run: unzip -o proje.zip -d extracted
 
-      - name: Build APK & AAB
+      - name: Find and Build
         run: |
-          DIR=$(find extracted -type f -name "gradlew" | head -n 1 | xargs dirname)
-          echo "Gradle path: $DIR"
+          FILE=$(find extracted -type f -name "gradlew" | head -n 1)
+          DIR=$(dirname "$FILE")
+
+          echo "FOUND: $FILE"
+          echo "DIR: $DIR"
 
           cd "$DIR"
           chmod +x gradlew
