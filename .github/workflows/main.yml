@@ -11,36 +11,34 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Java
+      - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          distribution: temurin
+          distribution: 'temurin'
           java-version: '17'
 
-      - name: Check zip
-        run: unzip -t proje.zip
-
-      - name: Unzip project
-        run: unzip -o proje.zip -d project
-
-      - name: Build AAB and APK
-        shell: bash
+      - name: Fix splash crash
         run: |
-          DIR="$(dirname "$(find project -type f -name gradlew | head -n 1)")"
-          chmod +x "$DIR/gradlew"
-          cd "$DIR"
-          ./gradlew clean bundleNormalRelease assembleNormalDebug --stacktrace
+          sed -i 's/@drawable\/splash/@android:color\/white/g' android/app/src/main/res/values/*.xml || true
+          sed -i 's/@drawable\/splash/@android:color\/white/g' android/app/src/main/res/values-night/*.xml || true
 
-      - name: Upload AAB
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-normal-release
-          path: project/**/app/build/outputs/bundle/normalRelease/*.aab
-          if-no-files-found: error
+      - name: Grant permission
+        run: chmod +x gradlew
+
+      - name: Build APK
+        run: ./gradlew assembleRelease
+
+      - name: Build AAB
+        run: ./gradlew bundleRelease
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-normal-debug-apk
-          path: project/**/app/build/outputs/apk/normal/debug/*.apk
-          if-no-files-found: error
+          name: app-release-apk
+          path: android/app/build/outputs/apk/release/app-release.apk
+
+      - name: Upload AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
