@@ -17,30 +17,27 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      # 🔧 Splash hatasını otomatik fix
+      # splash hatasını fix
       - name: Fix splash crash
         run: |
-          sed -i 's/@drawable\/splash/@android:color\/white/g' android/app/src/main/res/values/*.xml || true
-          sed -i 's/@drawable\/splash/@android:color\/white/g' android/app/src/main/res/values-night/*.xml || true
+          sed -i 's/@drawable\/splash/@android:color\/white/g' app/src/main/res/values/*.xml || true
+          sed -i 's/@drawable\/splash/@android:color\/white/g' app/src/main/res/values-night/*.xml || true
 
-      # 🔥 BUILD BURASI
+      # 🔥 DOĞRU BUILD
       - name: Build APK & AAB
         run: |
-          cd android
           chmod +x gradlew
           ./gradlew assembleRelease
           ./gradlew bundleRelease
 
-      # 📦 APK indir
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: app-release-apk
-          path: android/app/build/outputs/apk/release/app-release.apk
+          path: app/build/outputs/apk/release/app-release.apk
 
-      # 📦 AAB indir
       - name: Upload AAB
         uses: actions/upload-artifact@v4
         with:
           name: app-release-aab
-          path: android/app/build/outputs/bundle/release/app-release.aab
+          path: app/build/outputs/bundle/release/app-release.aab
