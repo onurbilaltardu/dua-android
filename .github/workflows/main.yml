@@ -17,31 +17,36 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      # 🔍 Android klasörünü bul
-      - name: Find Android folder
-        id: finddir
+      # ZIP'i aç
+      - name: Unzip project
         run: |
-          DIR=$(find . -type d -name "android" | head -n 1)
-          echo "DIR=$DIR" >> $GITHUB_OUTPUT
-          echo "Found android at: $DIR"
+          unzip -o proje.zip -d extracted
 
-      # ❌ Eğer bulamazsa direkt hata ver
+      # İçinde gradlew olan klasörü bul
+      - name: Find gradlew folder
+        id: find
+        run: |
+          DIR=$(find extracted -type f -name "gradlew" | head -n 1 | xargs dirname)
+          echo "DIR=$DIR" >> $GITHUB_OUTPUT
+          echo "Found gradlew in: $DIR"
+
+      # Bulamazsa patlat (net görelim)
       - name: Stop if not found
         run: |
-          if [ -z "${{ steps.finddir.outputs.DIR }}" ]; then
-            echo "ANDROID FOLDER NOT FOUND"
+          if [ -z "${{ steps.find.outputs.DIR }}" ]; then
+            echo "GRADLEW NOT FOUND"
             exit 1
           fi
 
-      # 🔧 Splash fix
+      # Splash fix (varsa)
       - name: Fix splash
         run: |
-          sed -i 's/@drawable\/splash/@android:color\/white/g' ${{ steps.finddir.outputs.DIR }}/app/src/main/res/values/*.xml || true
+          sed -i 's/@drawable\/splash/@android:color\/white/g' ${{ steps.find.outputs.DIR }}/app/src/main/res/values/*.xml || true
 
-      # 🔥 BUILD
+      # BUILD
       - name: Build
         run: |
-          cd ${{ steps.finddir.outputs.DIR }}
+          cd ${{ steps.find.outputs.DIR }}
           chmod +x gradlew
           ./gradlew assembleRelease
           ./gradlew bundleRelease
