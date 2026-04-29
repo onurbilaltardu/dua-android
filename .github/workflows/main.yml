@@ -17,16 +17,31 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Find gradlew
+      # 🔍 Android klasörünü bul
+      - name: Find Android folder
+        id: finddir
         run: |
-          echo "Searching for gradlew..."
-          find . -name "gradlew"
+          DIR=$(find . -type d -name "android" | head -n 1)
+          echo "DIR=$DIR" >> $GITHUB_OUTPUT
+          echo "Found android at: $DIR"
 
+      # ❌ Eğer bulamazsa direkt hata ver
+      - name: Stop if not found
+        run: |
+          if [ -z "${{ steps.finddir.outputs.DIR }}" ]; then
+            echo "ANDROID FOLDER NOT FOUND"
+            exit 1
+          fi
+
+      # 🔧 Splash fix
+      - name: Fix splash
+        run: |
+          sed -i 's/@drawable\/splash/@android:color\/white/g' ${{ steps.finddir.outputs.DIR }}/app/src/main/res/values/*.xml || true
+
+      # 🔥 BUILD
       - name: Build
         run: |
-          DIR=$(find . -name "gradlew" | head -n 1 | xargs dirname)
-          echo "Gradle dir: $DIR"
-          cd $DIR
+          cd ${{ steps.finddir.outputs.DIR }}
           chmod +x gradlew
           ./gradlew assembleRelease
           ./gradlew bundleRelease
