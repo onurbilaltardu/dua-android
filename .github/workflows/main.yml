@@ -17,15 +17,16 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      # splash hatasını fix
-      - name: Fix splash crash
+      - name: Find gradlew
         run: |
-          sed -i 's/@drawable\/splash/@android:color\/white/g' app/src/main/res/values/*.xml || true
-          sed -i 's/@drawable\/splash/@android:color\/white/g' app/src/main/res/values-night/*.xml || true
+          echo "Searching for gradlew..."
+          find . -name "gradlew"
 
-      # 🔥 DOĞRU BUILD
-      - name: Build APK & AAB
+      - name: Build
         run: |
+          DIR=$(find . -name "gradlew" | head -n 1 | xargs dirname)
+          echo "Gradle dir: $DIR"
+          cd $DIR
           chmod +x gradlew
           ./gradlew assembleRelease
           ./gradlew bundleRelease
@@ -33,11 +34,11 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-release-apk
-          path: app/build/outputs/apk/release/app-release.apk
+          name: apk
+          path: '**/app-release.apk'
 
       - name: Upload AAB
         uses: actions/upload-artifact@v4
         with:
-          name: app-release-aab
-          path: app/build/outputs/bundle/release/app-release.aab
+          name: aab
+          path: '**/*.aab'
