@@ -18,27 +18,36 @@ jobs:
       - name: Unzip
         run: |
           unzip -o proje.zip -d extracted
-          ls -R extracted
 
-      - name: Find gradlew safely
+      - name: Find gradlew
         run: |
           FILE=$(find extracted -type f -name gradlew | head -n 1)
-          echo "FOUND FILE: $FILE"
-
           DIR=$(dirname "$FILE")
-          echo "DIR: $DIR"
-
           echo "DIR=$DIR" >> $GITHUB_ENV
 
-      - name: Fix missing splash drawable
+      - name: Fix missing drawables
         run: |
-          mkdir -p "$DIR/app/src/main/res/drawable"
-          rm -rf "$DIR/app/src/main/res/drawable/splash.xml"
-          cat > "$DIR/app/src/main/res/drawable/splash.xml" <<'EOF'
-          <?xml version="1.0" encoding="utf-8"?>
+          DRAWABLE="$DIR/app/src/main/res/drawable"
+          mkdir -p "$DRAWABLE"
+
+          # splash fix
+          cat > "$DRAWABLE/splash.xml" <<'EOF'
           <shape xmlns:android="http://schemas.android.com/apk/res/android">
               <solid android:color="#FFFFFF"/>
           </shape>
+          EOF
+
+          # ic_actionbar fix
+          cat > "$DRAWABLE/ic_actionbar.xml" <<'EOF'
+          <vector xmlns:android="http://schemas.android.com/apk/res/android"
+              android:width="24dp"
+              android:height="24dp"
+              android:viewportWidth="24"
+              android:viewportHeight="24">
+              <path
+                  android:fillColor="#000000"
+                  android:pathData="M3,6h18M3,12h18M3,18h18"/>
+          </vector>
           EOF
 
       - name: Build
